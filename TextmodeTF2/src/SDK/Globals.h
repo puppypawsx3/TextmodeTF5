@@ -6,6 +6,8 @@
 #define TEXTMODE_LOG_FILE "TextmodeLog.log"
 #define CONSOLE_LOG_FILE "Console.log"
 
+class IMDLCache;
+
 namespace G
 {
 	inline std::string CurrentPath{};
@@ -27,4 +29,6 @@ namespace G
 	inline uintptr_t CModelRender_DrawModelExecuteAddr{};
 	inline uintptr_t CDebugOverlay_AddBoxOverlayAddr{};
 	inline uintptr_t CDebugOverlay_AddLineOverlayAddr{};
+	inline uintptr_t CParticleSystemMgr_ReadParticleConfigFileAddr{};
+	inline IMDLCache* IMDLCache{};
 };

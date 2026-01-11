@@ -36,7 +36,7 @@ int CCore::LoadFilesystem()
 		"IFileSystem_AsyncReadMultiple", "IFileSystem_OpenEx",
 		"IFileSystem_ReadFileEx", "IFileSystem_AddFilesToFileCache",
 		"IBaseFileSystem_Open", "IBaseFileSystem_Precache",
-		"IBaseFileSystem_ReadFile"
+		"IBaseFileSystem_ReadFile", "IBaseFileSystem_FileExists"
 	};
 
 	for (auto cHook : vFilesystemHooks)
@@ -146,7 +146,7 @@ int CCore::LoadMatSys()
 	{
 		"IMaterialSystem_CreateRenderTargetTexture", "IMaterialSystem_CreateNamedRenderTargetTextureEx",
 		"IMaterialSystem_CreateNamedRenderTargetTexture", "IMaterialSystem_CreateNamedRenderTargetTextureEx2",
-		"IMaterialSystem_SwapBuffers"
+		"IMaterialSystem_SwapBuffers", "IMaterialSystem_FindMaterial", "IMaterialSystem_FindTexture"
 	};
 
 	for (auto cHook : vMatSystemHooks)
@@ -172,16 +172,33 @@ int CCore::LoadParticles()
 	if (!G::CParticleCollection_SimulateAddr)
 		G::CParticleCollection_SimulateAddr = U::Memory.FindSignature("client.dll", "48 8B C4 44 88 40 18 57 41 56 48 81 EC 08 01 00 00");
 
-	if (G::CParticleSystemMgr_DrawRenderCacheAddr && G::CParticleCollection_SimulateAddr)
+	if (!G::CParticleSystemMgr_ReadParticleConfigFileAddr)
+		G::CParticleSystemMgr_ReadParticleConfigFileAddr = U::Memory.FindSignature("client.dll", "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 56 41 57 48 81 EC ?? ?? ?? ?? 80 3A 21 48 8D 7A 01");
+
+	if (G::CParticleSystemMgr_DrawRenderCacheAddr && G::CParticleCollection_SimulateAddr && G::CParticleSystemMgr_ReadParticleConfigFileAddr)
 	{
 		if (!U::Hooks.Initialize("CParticleSystemMgr_DrawRenderCache"))
 			return LOAD_FAIL;
 		if (!U::Hooks.Initialize("CParticleCollection_Simulate"))
 			return LOAD_FAIL;
-		return m_bParticlesLoaded = true;
+		if (!U::Hooks.Initialize("CParticleSystemMgr_ReadParticleConfigFile"))
+			return LOAD_FAIL;
+		m_bParticlesLoaded = true;
 	}
 
 	return LOAD_WAIT;
+}
+
+int CCore::LoadMDLCache()
+{
+	G::IMDLCache = reinterpret_cast<IMDLCache*>(U::Memory.FindInterface("datacache.dll", "MDLCache004"));
+	if (!G::IMDLCache)
+		return LOAD_WAIT;
+
+	if (!U::Hooks.Initialize("IMDLCache_ProcessDataIntoCache"))
+		return LOAD_FAIL;
+
+	return m_bMDLCacheLoaded = true;
 }
 
 void CCore::Load()
@@ -233,8 +250,11 @@ void CCore::Load()
 
 		int iParticles = m_bParticlesLoaded ? 1 : LoadParticles();
 		CHECK(iParticles, "Failed to load particle system")
+
+		int iMDLCache = m_bMDLCacheLoaded ? 1 : LoadMDLCache();
+		CHECK(iMDLCache, "Failed to load MDL cache")
 	}
-	while (!m_bFilesystemLoaded || !m_bEngineLoaded || !m_bMatSysLoaded || !m_bClientLoaded || !m_bParticlesLoaded);
+	while (!m_bFilesystemLoaded || !m_bEngineLoaded || !m_bMatSysLoaded || !m_bClientLoaded || !m_bParticlesLoaded || !m_bMDLCacheLoaded);
 
 	SDK::Output("TextmodeTF2", std::format("Loaded in {} seconds", SDK::PlatFloatTime()).c_str());
 }

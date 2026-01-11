@@ -78,7 +78,7 @@ bool SDK::BlacklistFile(const char* cFileName)
 {
 	const static char* blacklist[] = {
 		".ani", ".wav", ".mp3", ".vvd", ".vtx", ".vtf", ".vfe", ".cache",
-		".jpg", ".png", ".tga", ".dds",  // Texture files we dont need in textmode
+		".jpg", ".png", ".tga", ".dds", ".vmt", // Texture and material files
 		".phy",  // Physics
 		".dem",  // Demo and log files
 		".vcd",  // Scene files
@@ -87,8 +87,17 @@ bool SDK::BlacklistFile(const char* cFileName)
 		".pcf"   // Particle systems
 	};
 
-	if (!cFileName || !std::strncmp(cFileName, "materials/console/", 18))
+	if (!cFileName)
 		return false;
+
+	if (!std::strncmp(cFileName, "materials/console/", 18))
+		return false;
+
+	if (!std::strncmp(cFileName, "debug/", 6))
+		return false;
+
+	if (!std::strncmp(cFileName, "sprites/", 8))
+		return true;
 
 	std::size_t len = std::strlen(cFileName);
 	if (len <= 3)

@@ -231,7 +231,9 @@
     <ClCompile Include="src\Hooks\CModelLoader_GetModelForName.cpp" />
     <ClCompile Include="src\Hooks\CModelRender_DrawModelExecute.cpp" />
     <ClCompile Include="src\Hooks\CParticleCollection_Simulate.cpp" />
+    <ClCompile Include="src\Hooks\IMDLCache_ProcessDataIntoCache.cpp" />
     <ClCompile Include="src\Hooks\CParticleSystemMgr_DrawRenderCache.cpp" />
+    <ClCompile Include="src\Hooks\CParticleSystemMgr_ReadParticleConfigFile.cpp" />
     <ClCompile Include="src\Hooks\CStaticPropMgr_DrawStaticProps.cpp" />
     <ClCompile Include="src\Hooks\CStaticPropMgr_UnserializeStaticProps.cpp" />
     <ClCompile Include="src\Hooks\CVideoModeCommon_SetupStartupGraphic.cpp" />
@@ -258,6 +260,7 @@
     <ClInclude Include="include\MinHook\trampoline.h" />
     <ClInclude Include="src\BytePatches\BytePatches.h" />
     <ClInclude Include="src\SDK\Definitions\Interfaces\IMaterialSystem.h" />
+    <ClInclude Include="src\SDK\Definitions\Interfaces\IMDLCache.h" />
     <ClInclude Include="src\SDK\Definitions\Interfaces\Interface.h" />
     <ClInclude Include="src\Core\Core.h" />
     <ClInclude Include="src\SDK\Definitions\Definitions.h" />
